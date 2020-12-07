@@ -5,7 +5,7 @@
                 <v-list-tile-action>
                 <v-icon>construction</v-icon>
                 </v-list-tile-action>
-                <v-toolbar-title>Artículos rodrigo mira</v-toolbar-title>
+                <v-toolbar-title>Artículos</v-toolbar-title>
                     <v-divider
                     class="mx-2"
                     inset
