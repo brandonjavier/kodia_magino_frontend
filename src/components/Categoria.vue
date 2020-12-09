@@ -165,7 +165,9 @@
         methods:{
             listar(){
                 let me=this;
-                axios.get('api/Categorias/Listar').then(function(response){
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion={headers : header};
+                axios.get('api/Categorias/Listar' , configuracion).then(function(response){
                     //console.log(response);
                     me.categorias=response.data;
                 }).catch(function(error){
@@ -199,6 +201,8 @@
                 if (this.validar()){
                     return;
                 }
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion={headers : header};
                 if (this.editedIndex > -1) {
                     //Código para editar
                     //Código para guardar
@@ -207,7 +211,7 @@
                         'idcategoria':me.id,
                         'nombre': me.nombre,
                         'descripcion': me.descripcion
-                    }).then(function(response){
+                    },configuracion).then(function(response){
                         me.close();
                         me.listar();
                         me.limpiar();                        
@@ -220,7 +224,7 @@
                     axios.post('api/Categorias/Crear',{
                         'nombre': me.nombre,
                         'descripcion': me.descripcion
-                    }).then(function(response){
+                    },configuracion).then(function(response){
                         me.close();
                         me.listar();
                         me.limpiar();                        
@@ -260,7 +264,9 @@
             },
             activar(){
                 let me=this;
-                axios.put('api/Categorias/Activar/'+this.adId,{}).then(function(response){
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion={headers : header};
+                axios.put('api/Categorias/Activar/'+this.adId,{},configuracion).then(function(response){
                     me.adModal=0;
                     me.adAccion=0;
                     me.adNombre="";
@@ -272,7 +278,9 @@
             },
             desactivar(){
                 let me=this;
-                axios.put('api/Categorias/Desactivar/'+this.adId,{}).then(function(response){
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion={headers : header};
+                axios.put('api/Categorias/Desactivar/'+this.adId,{},configuracion).then(function(response){
                     me.adModal=0;
                     me.adAccion=0;
                     me.adNombre="";

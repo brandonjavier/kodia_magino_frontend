@@ -1,15 +1,14 @@
 <template>
-  <v-app id="app" >
-    <v-navigation-drawer 
+  <v-app id="app">
+    <v-navigation-drawer
       fixed
       :clipped="$vuetify.breakpoint.mdAndUp"
       app
       v-model="drawer"
+      v-if="logueado"
     >
-      <v-list dense >
-
-
-        <template>
+      <v-list dense>
+        <template v-if="esAdministrador || esAlmacenero || esVendedor">
           <v-list-tile :to="{name:'home'}">
             <v-list-tile-action>
               <v-icon>home</v-icon>
@@ -19,12 +18,7 @@
             </v-list-tile-title>
           </v-list-tile>
         </template>
-
-
-
-
-
-        <template>
+        <template v-if="esAdministrador || esAlmacenero">
           <v-list-group>
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -56,15 +50,7 @@
 
           </v-list-group>
         </template>
-
-
-
-
-
-
-
-
-        <template>
+        <template v-if="esAdministrador || esAlmacenero">
           <v-list-group>
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -73,7 +59,7 @@
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile :to="{ name: ''}">
+            <v-list-tile :to="{ name: 'ingresos'}">
               <v-list-tile-action>
                 <v-icon>add_shopping_cart</v-icon>
               </v-list-tile-action>
@@ -83,7 +69,7 @@
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile :to="{ name: ''}">
+            <v-list-tile :to="{ name: 'proveedores'}">
               <v-list-tile-action>
                 <v-icon>supervisor_account</v-icon>
               </v-list-tile-action>
@@ -96,26 +82,26 @@
 
           </v-list-group>
         </template>
-        <template>
+        <template v-if="esAdministrador|| esVendedor">
           <v-list-group>
             <v-list-tile slot="activator">
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  Cotizaciones
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile :to="{ name: 'ventas'}">
+              <v-list-tile-action>
+                <v-icon>receipt_long</v-icon>
+              </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
                   Ventas
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile :to="{ name: ''}">
-              <v-list-tile-action>
-                <v-icon>receipt_long</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>
-                  Proformas
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile :to="{ name: ''}">
+            <v-list-tile :to="{ name: 'clientes'}">
               <v-list-tile-action>
                 <v-icon>accessibility</v-icon>
               </v-list-tile-action>
@@ -128,7 +114,7 @@
 
           </v-list-group>
         </template>
-        <template>
+        <template v-if="esAdministrador">
           <v-list-group>
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -160,7 +146,7 @@
 
           </v-list-group>
         </template>
-        <template>
+        <template v-if="esAdministrador">
           <v-list-group>
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -175,17 +161,17 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Consultas compras
+                  Predicción de cotizaciones
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile :to="{ name: ''}">
+            <v-list-tile :to="{ name: 'consultaventas'}">
               <v-list-tile-action>
                 <v-icon>insert_chart_outlined</v-icon>
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Consultas ventas
+                  Estadística de ventas
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -201,34 +187,38 @@
       :clipped-left="$vuetify.breakpoint.mdAndUp"
       fixed
     >
-      <v-toolbar-title  style="width: 300px" class="ml-0 pl-3">
-        
-        <v-toolbar-side-icon class="primary--text" @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <span  class="hidden-sm-and-down primary--text">Magino</span>
-         
+      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+        <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <span class="hidden-sm-and-down">Magino</span>
       </v-toolbar-title>
-      
       <v-spacer></v-spacer>
 
+      <v-btn @click="salir" v-if="logueado" icon>
+        <v-icon>logout</v-icon> Salir
+      </v-btn>
+      <v-btn :to="{name: 'login'}" v-else>
+        <v-icon>apps</v-icon> Login
+      </v-btn>
       <v-btn large class="primary--text" href="https://www.facebook.com/Representaciones-Magino-SAC-491001671419571/" icon>
         <v-icon>facebook</v-icon>
       </v-btn>
-      
-      
     </v-toolbar>
     <v-content>
+
+      
       <v-container fluid fill-height>
         <v-slide-y-transition mode="out-in">
           <router-view/>
         </v-slide-y-transition>
       </v-container>
     </v-content>
+
     <v-footer dark height="auto">
       <v-layout justify-center>
         <v-flex text-xs-center>
-          <v-card flat tile color="#FFFFFF" class="blue--text">
-            <v-card-text  class="primary--text pt-0">
-              Representaciones Magino S.A.C &copy;2020
+          <v-card flat tile color="#FFFFFF" class="white--text">
+            <v-card-text class="primary--text pt-0">
+              Representaaciones Magino S.A.C &copy;2020
             </v-card-text>
           </v-card>
         </v-flex>
@@ -247,7 +237,6 @@ export default {
       clipped: false,
       drawer: true,
       fixed: false,
-      
       items: [{
         icon: 'bubble_chart',
         title: 'Inspire'
@@ -255,10 +244,29 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js',
-      avatar:'https://cdn.vuetifyjs.com/images/lists/1.jpg'
-          
-      
+      title: 'Vuetify.js'
+    }
+  },
+  computed: {
+    logueado(){
+      return this.$store.state.usuario;
+    },
+    esAdministrador(){
+      return this.$store.state.usuario && this.$store.state.usuario.rol =='Administrador';
+    },
+    esAlmacenero(){
+      return this.$store.state.usuario && this.$store.state.usuario.rol =='Almacenero';
+    },
+    esVendedor(){
+      return this.$store.state.usuario && this.$store.state.usuario.rol =='Vendedor';
+    }
+  },
+  created(){
+    this.$store.dispatch("autoLogin");
+  },
+  methods:{
+    salir(){
+      this.$store.dispatch("salir");
     }
   }
 }

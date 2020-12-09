@@ -2,9 +2,9 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
-                <v-list-tile-action>
-                <v-icon>construction</v-icon>
-                </v-list-tile-action>
+                <v-btn @click="crearPDF()">
+                    <v-icon>print</v-icon>
+                </v-btn>
                 <v-toolbar-title>Artículos</v-toolbar-title>
                     <v-divider
                     class="mx-2"
@@ -144,6 +144,8 @@
 </template>
 <script>
     import axios from 'axios'
+    import jsPDF from 'jspdf'
+    import autoTable from 'jspdf-autotable';
     export default {
         data(){
             return {
@@ -195,9 +197,35 @@
             this.select();
         },
         methods:{
+            crearPDF()  {
+                var columns = [
+                    {title: "Nombre", dataKey: "nombre"},
+                    {title: "Código", dataKey: "codigo"}, 
+                    {title: "Categoría", dataKey: "categoria"}, 
+                    {title: "Stock", dataKey: "stock"},
+                    {title: "Precio Venta", dataKey: "precio_venta"}
+                ];
+                var rows = [];
+
+                this.articulos.map(function(x){
+                    rows.push({nombre:x.nombre,codigo:x.codigo,categoria:x.categoria,stock:x.stock,precio_venta:x.precio_venta});
+                });
+
+                // Only pt supported (not mm or in)
+                var doc = new jsPDF('p', 'pt');
+                doc.autoTable(columns, rows, {
+                    margin: {top: 60},
+                    addPageContent: function(data) {
+                        doc.text("Listado de Artículos", 40, 30);
+                    }
+                });
+                doc.save('Articulos.pdf');
+            },
             listar(){
                 let me=this;
-                axios.get('api/Articulos/Listar').then(function(response){
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion= {headers : header};
+                axios.get('api/Articulos/Listar',configuracion).then(function(response){
                     //console.log(response);
                     me.articulos=response.data;
                 }).catch(function(error){
@@ -206,8 +234,10 @@
             },
             select(){
                 let me=this;
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion= {headers : header};
                 var categoriasArray=[];
-                axios.get('api/Categorias/Select').then(function(response){
+                axios.get('api/Categorias/Select',configuracion).then(function(response){
                     categoriasArray=response.data;
                     categoriasArray.map(function(x){
                         me.categorias.push({text: x.nombre,value:x.idcategoria});
@@ -245,6 +275,8 @@
                 if (this.validar()){
                     return;
                 }
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion= {headers : header};
                 if (this.editedIndex > -1) {
                     //Código para editar
                     //Código para guardar
@@ -257,7 +289,7 @@
                         'stock':me.stock,
                         'precio_venta':me.precio_venta,
                         'descripcion': me.descripcion
-                    }).then(function(response){
+                    },configuracion).then(function(response){
                         me.close();
                         me.listar();
                         me.limpiar();                        
@@ -274,7 +306,7 @@
                         'stock':me.stock,
                         'precio_venta':me.precio_venta,
                         'descripcion': me.descripcion
-                    }).then(function(response){
+                    },configuracion).then(function(response){
                         me.close();
                         me.listar();
                         me.limpiar();                        
@@ -323,7 +355,9 @@
             },
             activar(){
                 let me=this;
-                axios.put('api/Articulos/Activar/'+this.adId,{}).then(function(response){
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion= {headers : header};
+                axios.put('api/Articulos/Activar/'+this.adId,{},configuracion).then(function(response){
                     me.adModal=0;
                     me.adAccion=0;
                     me.adNombre="";
@@ -335,7 +369,9 @@
             },
             desactivar(){
                 let me=this;
-                axios.put('api/Articulos/Desactivar/'+this.adId,{}).then(function(response){
+                let header={"Authorization" : "Bearer " + this.$store.state.token};
+                let configuracion= {headers : header};
+                axios.put('api/Articulos/Desactivar/'+this.adId,{},configuracion).then(function(response){
                     me.adModal=0;
                     me.adAccion=0;
                     me.adNombre="";
