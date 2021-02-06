@@ -7,7 +7,7 @@ import store from './store'
 import axios from 'axios'
 
 Vue.config.productionTip = false
-axios.defaults.baseURL='https://www.magino.net.pe/'
+axios.defaults.baseURL='https://maginoback.azurewebsites.net'
 new Vue({
   router,
   store,
